@@ -1,5 +1,5 @@
 import { userModel } from "../../../models/user.model.js"
-
+import bcrypt from "bcrypt"
 
 const signUp = async(req, res) => {
 
@@ -11,7 +11,8 @@ if(user) {
     message: "user already exists"
   });
   } else {
-    await userModel.insertMany({  name, email, password});
+    const hash = bcrypt.hashSync(password, 8)
+    await userModel.insertMany({  name, email, password:hash});
     res.json({ message: "User created successfully"});
   }
 
