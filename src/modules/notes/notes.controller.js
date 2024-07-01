@@ -1,11 +1,16 @@
 import { notesModel } from "./../../../models/notes.model.js";
-
+import jwt from "jsonwebtoken";
 const addNote = async (req, res) => {
-  const { title, desc, createdBy } = req.body;
-  await notesModel.insertMany({ title, desc, createdBy });
-  res.json({ message: "Note created successfully" });
+  const { title, desc, createdBy, token } = req.body;
+  jwt.verify(token, "myNameIsAnouar", async (err, decoded) => {
+    if (err) {
+      res.json({ message: "invalid token", err });
+    } else {
+      await notesModel.insertMany({ title, desc, createdBy });
+      res.json({ message: "Note created successfully" });
+    }
+  });
 };
-
 
 // const updateNote = async (req, res) => {
 //   const { title, desc, id } = req.body;
@@ -15,8 +20,12 @@ const addNote = async (req, res) => {
 
 const updateNote = async (req, res) => {
   const { title, desc, id } = req.body;
-  let note = await notesModel.findByIdAndUpdate(id, {title, desc}, {new: true});
-  if(!note) return  res.json({ message: "Note not found" });
+  let note = await notesModel.findByIdAndUpdate(
+    id,
+    { title, desc },
+    { new: true }
+  );
+  if (!note) return res.json({ message: "Note not found" });
   res.json({ message: "Note updated successfully", note });
 };
 // here is an example of input on Postman to use the findByIdAndUpdate method below
@@ -29,19 +38,19 @@ const updateNote = async (req, res) => {
 const deleteNote = async (req, res) => {
   const { id } = req.body;
   let note = await notesModel.findByIdAndDelete(id);
-  if(!note) return  res.json({ message: "Note not found" });
+  if (!note) return res.json({ message: "Note not found" });
   res.json({ message: "Note deleted successfully", note });
 };
 
 const getAllNotes = async (req, res) => {
- let note = await notesModel.find({}).populate('createdBy', 'name -_id' );
+  let note = await notesModel.find({}).populate("createdBy", "name -_id");
   res.json({ message: "success", note });
 };
 
 const getUserNotes = async (req, res) => {
-  const {createdBy} = req.params;
-    let note = await notesModel.find({createdBy});
-    res.json({ message: "success", note });
-  };
+  const { createdBy } = req.params;
+  let note = await notesModel.find({ createdBy });
+  res.json({ message: "success", note });
+};
 
-export { addNote ,updateNote ,deleteNote ,getAllNotes ,getUserNotes };
+export { addNote, updateNote, deleteNote, getAllNotes, getUserNotes };
