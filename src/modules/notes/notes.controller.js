@@ -42,9 +42,20 @@ const deleteNote = async (req, res) => {
   res.json({ message: "Note deleted successfully", note });
 };
 
+
+
 const getAllNotes = async (req, res) => {
-  let note = await notesModel.find({}).populate("createdBy", "name -_id");
-  res.json({ message: "success", note });
+
+let token = req.header('token')
+console.log(token);
+jwt.verify(token, "myNameIsAnouar", async (err, decoded) => {
+  if (err) {
+    res.json({ message: "invalid token", err });
+  } else {
+    let note = await notesModel.find({}).populate("createdBy", "name -_id");
+    res.json({ message: "success", note });
+  }
+});
 };
 
 const getUserNotes = async (req, res) => {
