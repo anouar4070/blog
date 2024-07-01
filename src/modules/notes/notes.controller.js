@@ -6,6 +6,7 @@ const addNote = async (req, res) => {
   res.json({ message: "Note created successfully" });
 };
 
+
 // const updateNote = async (req, res) => {
 //   const { title, desc, id } = req.body;
 //   await notesModel.updateOne({createdBy: "668188e95f393be394a4a8ef"}, {title: "new post"});
@@ -33,8 +34,7 @@ const deleteNote = async (req, res) => {
 };
 
 const getAllNotes = async (req, res) => {
-
-  let note = await notesModel.find({});
+ let note = await notesModel.find({}).populate('createdBy', 'name -_id' );
   res.json({ message: "success", note });
 };
 
